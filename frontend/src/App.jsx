@@ -83,6 +83,21 @@ function App() {
 
         <div>Owner: {item.owner || "—"}</div>
         <div>Due: {item.due_date || "—"}</div>
+        <button
+  onClick={async () => {
+    await fetch(`http://127.0.0.1:8000/tasks/${item.id}`, {
+      method: "DELETE",
+    });
+
+    setResult((prev) => ({
+      ...prev,
+      action_items: prev.action_items.filter((t) => t.id !== item.id),
+    }));
+  }}
+>
+  Delete
+</button>
+
       </div>
     ))}
   </div>
