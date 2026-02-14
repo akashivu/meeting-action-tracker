@@ -4,6 +4,7 @@ function App() {
   const [transcript, setTranscript] = useState("");
   const [result, setResult] = useState(null);
   const [newTask, setNewTask] = useState("");
+  const [history, setHistory] = useState([]);
 
   const extractActionItems = async () => {
     if (!transcript.trim()) {
@@ -23,6 +24,11 @@ function App() {
     const data = await response.json();
     setResult(data);
   };
+const loadHistory = async () => {
+  const res = await fetch("http://127.0.0.1:8000/history");
+  const data = await res.json();
+  setHistory(data);
+};
 
   return (
     <div style={{ padding: "40px", fontFamily: "Arial" }}>
@@ -40,6 +46,27 @@ function App() {
       <br />
 
       <button onClick={extractActionItems}>Extract Action Items</button>
+      <button onClick={loadHistory} style={{ marginLeft: "10px" }}>
+  Load History
+</button>
+{history.length > 0 && (
+  <div style={{ marginTop: "30px" }}>
+    <h3>Last 5 Transcripts</h3>
+
+    {history.map((t) => (
+      <div
+        key={t.id}
+        style={{
+          border: "1px solid #aaa",
+          padding: "8px",
+          marginBottom: "8px",
+        }}
+      >
+        {t.content}
+      </div>
+    ))}
+  </div>
+)}
 
       <br />
       <br />
