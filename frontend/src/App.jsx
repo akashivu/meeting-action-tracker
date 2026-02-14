@@ -3,6 +3,7 @@ import { useState } from "react";
 function App() {
   const [transcript, setTranscript] = useState("");
   const [result, setResult] = useState(null);
+  const [newTask, setNewTask] = useState("");
 
   const extractActionItems = async () => {
     if (!transcript.trim()) {
@@ -46,6 +47,36 @@ function App() {
       {result?.action_items && (
   <div>
     <h3>Action Items</h3>
+    <div style={{ marginBottom: "20px" }}>
+  <input
+    placeholder="Add new task..."
+    value={newTask}
+    onChange={(e) => setNewTask(e.target.value)}
+  />
+
+  <button
+    onClick={async () => {
+      if (!newTask.trim()) return;
+
+      const response = await fetch(
+        `http://127.0.0.1:8000/tasks?task=${newTask}`,
+        { method: "POST" }
+      );
+
+      const data = await response.json();
+
+      setResult((prev) => ({
+        ...prev,
+        action_items: [...prev.action_items, data],
+      }));
+
+      setNewTask("");
+    }}
+  >
+    Add Task
+  </button>
+</div>
+
 
     {result.action_items.map((item) => (
       <div
