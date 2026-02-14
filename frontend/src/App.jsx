@@ -1,35 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [transcript, setTranscript] = useState("");
+  const [result, setResult] = useState(null);
+
+  const extractActionItems = async () => {
+    if (!transcript.trim()) {
+      alert("Please enter a transcript");
+      return;
+    }
+
+    const response = await fetch(
+      `http://127.0.0.1:8000/extract?transcript_text=${encodeURIComponent(
+        transcript
+      )}`,
+      {
+        method: "POST",
+      }
+    );
+
+    const data = await response.json();
+    setResult(data);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div style={{ padding: "40px", fontFamily: "Arial" }}>
+      <h1>Meeting Action Items Tracker</h1>
+
+      <textarea
+        rows="8"
+        cols="60"
+        placeholder="Paste meeting transcript..."
+        value={transcript}
+        onChange={(e) => setTranscript(e.target.value)}
+      />
+
+      <br />
+      <br />
+
+      <button onClick={extractActionItems}>Extract Action Items</button>
+
+      <br />
+      <br />
+
+      {result?.action_items && (
+  <div>
+    <h3>Action Items</h3>
+
+    {result.action_items.map((item, index) => (
+      <div
+        key={index}
+        style={{
+          border: "1px solid #ccc",
+          padding: "10px",
+          marginBottom: "10px",
+          borderRadius: "6px",
+        }}
+      >
+        <div><strong>Task:</strong> {item.task}</div>
+        <div><strong>Owner:</strong> {item.owner || "—"}</div>
+        <div><strong>Due:</strong> {item.due_date || "—"}</div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    ))}
+  </div>
+)}
+
+    </div>
+  );
 }
 
-export default App
+export default App;
