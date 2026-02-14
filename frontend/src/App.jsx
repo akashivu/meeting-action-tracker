@@ -5,6 +5,7 @@ function App() {
   const [result, setResult] = useState(null);
   const [newTask, setNewTask] = useState("");
   const [history, setHistory] = useState([]);
+  const [status, setStatus] = useState(null);
 
   const extractActionItems = async () => {
     if (!transcript.trim()) {
@@ -29,6 +30,11 @@ const loadHistory = async () => {
   const data = await res.json();
   setHistory(data);
 };
+const checkStatus = async () => {
+  const res = await fetch("http://127.0.0.1:8000/status");
+  const data = await res.json();
+  setStatus(data);
+};
 
   return (
     <div style={{ padding: "40px", fontFamily: "Arial" }}>
@@ -46,6 +52,10 @@ const loadHistory = async () => {
       <br />
 
       <button onClick={extractActionItems}>Extract Action Items</button>
+      <button onClick={checkStatus} style={{ marginLeft: "10px" }}>
+  Check System Status
+</button>
+
       <button onClick={loadHistory} style={{ marginLeft: "10px" }}>
   Load History
 </button>
@@ -158,6 +168,14 @@ const loadHistory = async () => {
 
       </div>
     ))}
+  </div>
+)}
+{status && (
+  <div style={{ marginTop: "30px" }}>
+    <h3>System Status</h3>
+    <div>Backend: {status.backend}</div>
+    <div>Database: {status.database}</div>
+    <div>LLM: {status.llm}</div>
   </div>
 )}
 
