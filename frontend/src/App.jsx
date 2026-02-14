@@ -42,14 +42,14 @@ function App() {
 
       <br />
       <br />
-
+      {/* Show action items only after extraction result is available */}
       {result?.action_items && (
   <div>
     <h3>Action Items</h3>
 
-    {result.action_items.map((item, index) => (
+    {result.action_items.map((item) => (
       <div
-        key={index}
+        key={item.id}
         style={{
           border: "1px solid #ccc",
           padding: "10px",
@@ -57,13 +57,37 @@ function App() {
           borderRadius: "6px",
         }}
       >
-        <div><strong>Task:</strong> {item.task}</div>
-        <div><strong>Owner:</strong> {item.owner || "—"}</div>
-        <div><strong>Due:</strong> {item.due_date || "—"}</div>
+        <div>
+          <input
+            type="checkbox"
+            checked={item.done || false}
+            onChange={async (e) => {
+  const updatedDone = e.target.checked;
+
+  await fetch(
+    `http://127.0.0.1:8000/tasks/${item.id}/done?done=${updatedDone}`,
+    { method: "PATCH" }
+  );
+
+  setResult((prev) => ({
+    ...prev,
+    action_items: prev.action_items.map((t) =>
+      t.id === item.id ? { ...t, done: updatedDone } : t
+    ),
+  }));
+}}
+
+          />
+          <strong style={{ marginLeft: "8px" }}>{item.task}</strong>
+        </div>
+
+        <div>Owner: {item.owner || "—"}</div>
+        <div>Due: {item.due_date || "—"}</div>
       </div>
     ))}
   </div>
 )}
+
 
     </div>
   );
